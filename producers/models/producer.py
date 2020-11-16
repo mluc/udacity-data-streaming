@@ -67,8 +67,8 @@ class Producer:
             [
                 NewTopic(
                     topic=self.topic_name,
-                    num_partitions=1,
-                    replication_factor=1,
+                    num_partitions=self.num_partitions,
+                    replication_factor=self.num_partitions,
                     config={
                         "cleanup.policy": "delete",
                         "compression.type": "lz4",
