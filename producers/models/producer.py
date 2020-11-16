@@ -9,6 +9,9 @@ from confluent_kafka.avro import AvroProducer
 
 logger = logging.getLogger(__name__)
 
+SCHEMA_REGISTRY_URL = "http://localhost:8081"
+BROKER_URL = "PLAINTEXT://localhost:9092"
+
 
 class Producer:
     """Defines and provides common functionality amongst Producers"""
@@ -38,9 +41,8 @@ class Producer:
         #
         #
         self.broker_properties = {
-            # TODO
-            # TODO
-            # TODO
+            "SCHEMA_REGISTRY_URL": "http://localhost:8081",
+            "BROKER_URL": "PLAINTEXT://localhost:9092"
         }
 
         # If the topic does not already exist, try to create it
@@ -49,8 +51,8 @@ class Producer:
             Producer.existing_topics.add(self.topic_name)
 
         # TODO: Configure the AvroProducer
-        # self.producer = AvroProducer(
-        # )
+        self.producer = AvroProducer({"bootstrap.servers": BROKER_URL, "schema.registry.url": SCHEMA_REGISTRY_URL},
+                                     default_key_schema=self.key_schema, default_value_schema=self.value_schema)
 
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
@@ -60,10 +62,31 @@ class Producer:
         # the Kafka Broker.
         #
         #
-        logger.info("topic creation kafka integration incomplete - skipping")
+        client = AdminClient({"bootstrap.servers": BROKER_URL})
+        futures = client.create_topics(
+            [
+                NewTopic(
+                    topic=self.topic_name,
+                    num_partitions=1,
+                    replication_factor=1,
+                    config={
+                        "cleanup.policy": "delete",
+                        "compression.type": "lz4",
+                        "delete.retention.ms": "2000",
+                        "file.delete.delay.ms": "2000",
+                    },
+                )
+            ]
+        )
 
-    def time_millis(self):
-        return int(round(time.time() * 1000))
+        for topic, future in futures.items():
+            try:
+                future.result()
+                logger.info(f"topic {self.topic_name} created")
+            except Exception as e:
+                logger.info(f"failed to create topic {self.topic_name}: {e}")
+
+        logger.info("topic creation kafka integration incomplete - skipping")
 
     def close(self):
         """Prepares the producer for exit by cleaning up the producer"""
@@ -72,6 +95,7 @@ class Producer:
         # TODO: Write cleanup code for the Producer here
         #
         #
+        self.producer.close()
         logger.info("producer close incomplete - skipping")
 
     def time_millis(self):
