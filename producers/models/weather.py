@@ -1,4 +1,5 @@
 """Methods pertaining to weather data"""
+from dataclasses import asdict
 from enum import IntEnum
 import json
 import logging
@@ -10,8 +11,8 @@ import requests
 
 from models.producer import Producer
 
-
 logger = logging.getLogger(__name__)
+TOPIC_NAME = 'weather'
 
 
 class Weather(Producer):
@@ -37,7 +38,7 @@ class Weather(Producer):
         #
         #
         super().__init__(
-            "weather", # TODO: Come up with a better topic name
+            TOPIC_NAME,  # TODO: Come up with a better topic name
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
         )
@@ -72,7 +73,6 @@ class Weather(Producer):
 
     def run(self, month):
         self._set_weather(month)
-
         #
         #
         # TODO: Complete the function by posting a weather event to REST Proxy. Make sure to
@@ -80,30 +80,22 @@ class Weather(Producer):
         #
         #
         logger.info("weather kafka proxy integration incomplete - skipping")
-        #resp = requests.post(
-        #    #
-        #    #
-        #    # TODO: What URL should be POSTed to?
-        #    #
-        #    #
-        #    f"{Weather.rest_proxy_url}/TODO",
-        #    #
-        #    #
-        #    # TODO: What Headers need to bet set?
-        #    #
-        #    #
-        #    headers={"Content-Type": "TODO"},
-        #    data=json.dumps(
-        #        {
-        #            #
-        #            #
-        #            # TODO: Provide key schema, value schema, and records
-        #            #
-        #            #
-        #        }
-        #    ),
-        #)
-        #resp.raise_for_status()
+        resp = requests.post(
+            f"{Weather.rest_proxy_url}/topics/{TOPIC_NAME}",
+            headers={"Content-Type": "application/vnd.kafka.json.v2+json"},
+            data=json.dumps(
+                {
+                    "key_schema": self.key_schema,
+                    "value_schema": self.value_schema,
+                    "records": [
+                        {
+                            "value": {"temperature": self.temp, "status": self.status.name}
+                        }
+                    ]
+                }
+            ),
+        )
+        resp.raise_for_status()
 
         logger.debug(
             "sent weather data to kafka, temp: %s, status: %s",
