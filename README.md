@@ -123,3 +123,31 @@ hello0
 hello1
 
 ```
+### Test Faust Stream Processor:
+- `python connector.py`
+- `python faust_stream.py worker`
+```
+(venv) Roberts-MBP:udacity-data-streaming myluc$ docker exec -it udacity-data-streaming_kafka0_1 bash
+root@d8786c7321bb:/# kafka-topics --list --zookeeper zookeeper:2181
+__confluent.support.metrics
+__consumer_offsets
+_confluent-ksql-ksql_service_docker_command_topic
+_schemas
+connect-config
+connect-offset
+connect-status
+my-topic-stations
+my-topic-stations-transformed
+stations-stream-__assignor-__leader
+
+root@d8786c7321bb:/# kafka-console-consumer --topic my-topic-stations --bootstrap-server localhost:9092 --from-beginning
+{"stop_id":30001,"direction_id":"E","stop_name":"Austin (O'Hare-bound)","station_name":"Austin","station_descriptive_name":"Austin (Blue Line)","station_id":40010,"order":29,"red":false,"blue":true,"green":false}
+{"stop_id":30002,"direction_id":"W","stop_name":"Austin (Forest Pk-bound)","station_name":"Austin","station_descriptive_name":"Austin (Blue Line)","station_id":40010,"order":29,"red":false,"blue":true,"green":false}
+...
+
+root@d8786c7321bb:/# kafka-console-consumer --topic my-topic-stations-transformed --bootstrap-server localhost:9092 --from-beginning
+{"station_id": 40010, "station_name": "Austin", "order": 29, "line": "blue", "__faust": {"ns": "consumers.udacity-data-streaming.faust_stream.TransformedStation"}}
+{"station_id": 40010, "station_name": "Austin", "order": 29, "line": "blue", "__faust": {"ns": "consumers.udacity-data-streaming.faust_stream.TransformedStation"}}
+...
+
+```
