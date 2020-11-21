@@ -12,7 +12,7 @@ import requests
 from models.producer import Producer
 
 logger = logging.getLogger(__name__)
-TOPIC_NAME = 'weather'
+TOPIC_NAME = 'org.chicago.cta.weather.v1'
 
 
 class Weather(Producer):
