@@ -1,7 +1,7 @@
 # Public Transit Status with Apache Kafka
 ## Testing:
 ### Test postgres:
-- `psql` from local tunnel through postgres:
+- `psql` from local to tunnel through postgres:
 ```
 (venv) Roberts-MBP:producers myluc$ psql -h localhost -p 5432 -d cta -U cta_admin --password
 Password:
