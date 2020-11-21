@@ -54,7 +54,6 @@ table = app.Table(
 #
 @app.agent(topic)
 async def stationevent(stationevents):
-    print('++++++++yrdying++++=')
     async for st in stationevents:
         if st.red:
             st_line = "red"
