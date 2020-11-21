@@ -52,19 +52,25 @@ table = app.Table(
 # then you would set the `line` of the `TransformedStation` record to the string `"red"`
 #
 #
-@app.agent(topic)
-async def stationevent(stationevents):
-    async for st in stationevents:
-        if st.red:
-            st_line = "red"
-        elif st.blue:
-            st_line = "blue"
-        else:
-            st_line = "green"
+def transform_station(st):
+    if st.red:
+        st_line = "red"
+    elif st.blue:
+        st_line = "blue"
+    else:
+        st_line = "green"
+    return TransformedStation(
+        station_id=st.station_id, station_name=st.station_name, order=st.order, line=st_line
+    )
 
-        table[st.station_id] = TransformedStation(
-            station_id=st.station_id, station_name=st.station_name, order=st.order, line=st_line
-        )
+
+@app.agent(topic)
+async def station(stations):
+    # use this processor before iterate on it
+    stations.add_processor(transform_station)
+    async for st in stations:
+        # st here is TransformedStation
+        table[st.station_id] = st
 
 if __name__ == "__main__":
     app.main()
