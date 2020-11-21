@@ -47,13 +47,12 @@ class Station(Producer):
         )
 
         self.station_id = int(station_id)
-        self.color = color
+        self.color = color.name
         self.dir_a = direction_a
         self.dir_b = direction_b
         self.a_train = None
         self.b_train = None
         self.turnstile = Turnstile(self)
-
 
     def run(self, train, direction, prev_station_id, prev_direction):
         """Simulates train arrivals at this station"""

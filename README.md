@@ -1,5 +1,57 @@
 # Public Transit Status with Apache Kafka
 ## Testing:
+### Test Kafka Producers:
+- `python producer_test.py`
+```
+(venv) Roberts-MBP:udacity-data-streaming myluc$ docker exec -it udacity-data-streaming_kafka0_1 bash
+root@c14de902f0e4:/# kafka-topics --list --zookeeper zookeeper:2181
+__confluent.support.metrics
+__consumer_offsets
+_confluent-ksql-ksql_service_docker_command_topic
+_schemas
+addison.arrival
+austin.arrival
+...
+turnstile
+uic_halsted.arrival
+washington.arrival
+western_and_forest_pk_branch.arrival
+western_and_ohare_branch.arrival
+root@c14de902f0e4:/# kafka-console-consumer --topic turnstile --bootstrap-server localhost:9092 --from-beginning
+��Irving Parblue
+��Irving Parblue
+��Irving Parblue
+��Irving Parblue
+��Addisoblue
+��Addisoblue
+��Belmonblue
+��Californiblue
+^CProcessed a total of 8 messages
+root@c14de902f0e4:/# kafka-console-consumer --topic addison.arrival --bootstrap-server localhost:9092 --from-beginning
+��
+BL001bluein_service��b
+��
+BL009bluein_service��a
+^CProcessed a total of 2 messages
+root@c14de902f0e4:/#
+```
+### Test Kafka REST Proxy Producer:
+- `python weather_test.py`
+```
+(venv) Roberts-MBP:udacity-data-streaming myluc$ docker exec -it udacity-data-streaming_kafka0_1 bash
+root@250d642995c2:/# kafka-topics --list --zookeeper zookeeper:2181
+__confluent.support.metrics
+__consumer_offsets
+_confluent-ksql-ksql_service_docker_command_topic
+_schemas
+connect-config
+connect-offset
+connect-status
+weather
+root@250d642995c2:/# kafka-console-consumer --topic weather --bootstrap-server localhost:9092 --from-beginning
+{"temperature":45.0563414899434,"status":"sunny"}
+
+```
 ### Test postgres:
 - `psql` from local to tunnel through postgres:
 ```
