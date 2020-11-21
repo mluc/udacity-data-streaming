@@ -1,7 +1,6 @@
 """Configures a Kafka Connector for Postgres Station data"""
 import json
 import logging
-import os
 
 import requests
 
@@ -39,21 +38,13 @@ def configure_connector():
                "value.converter": "org.apache.kafka.connect.json.JsonConverter",
                "value.converter.schemas.enable": "false",
                "batch.max.rows": "500",
-               # TODO
-               "connection.url": f"jdbc:postgresql://localhost:5432/{os.environ.get('POSTGRES_DB')}",
-               # TODO
-               "connection.user": os.environ.get('POSTGRES_USER'),
-               # TODO
-               "connection.password": os.environ.get('POSTGRES_PASSWORD'),
-               # TODO
+               "connection.url": "jdbc:postgresql://postgres:5432/cta",
+               "connection.user": "cta_admin",
+               "connection.password": "chicago",
                "table.whitelist": "stations",
-               # TODO
                "mode": "incrementing",
-               # TODO
                "incrementing.column.name": "stop_id",
-               # TODO
                "topic.prefix": "topic-prefix-",
-               # TODO
                "poll.interval.ms": "5000",
            }
        }),
