@@ -34,7 +34,7 @@ CREATE TABLE turnstile (
 
 CREATE TABLE turnstile_summary
 WITH (
-    KAFKA_TOPIC='turnstile.summary',
+    KAFKA_TOPIC='TURNSTILE_SUMMARY',
     VALUE_FORMAT='JSON'
 ) AS
     select station_id, count(*) as count from TURNSTILE group by station_id;
