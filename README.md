@@ -151,3 +151,142 @@ root@d8786c7321bb:/# kafka-console-consumer --topic my-topic-stations-transforme
 ...
 
 ```
+### Test KSQL:
+- `python producer_test.py` to create `turnstile` topic
+```
+(venv) Roberts-MBP:consumers myluc$ docker exec -it udacity-data-streaming_ksql_1 bash
+root@2378801f9f3a:/# ksql
+
+                  ===========================================
+                  =        _  __ _____  ____  _             =
+                  =       | |/ // ____|/ __ \| |            =
+                  =       | ' /| (___ | |  | | |            =
+                  =       |  <  \___ \| |  | | |            =
+                  =       | . \ ____) | |__| | |____        =
+                  =       |_|\_\_____/ \___\_\______|       =
+                  =                                         =
+                  =  Streaming SQL Engine for Apache Kafka® =
+                  ===========================================
+
+Copyright 2017-2018 Confluent Inc.
+
+CLI v5.2.2, Server v5.2.2 located at http://localhost:8088
+
+Having trouble? Type 'help' (case-insensitive) for a rundown of how things work!
+
+ksql> SET 'auto.offset.reset' = 'earliest';
+Successfully changed local property 'auto.offset.reset' to 'earliest'. Use the UNSET command to revert your change.
+
+ksql> CREATE TABLE turnstile (
+>    station_id INTEGER,
+>    station_name VARCHAR,
+>    line VARCHAR
+>) WITH (
+>    KAFKA_TOPIC='turnstile',
+>    VALUE_FORMAT='AVRO',
+>    KEY='station_id'
+>);
+
+ Message
+---------------
+ Table created
+---------------
+ksql> CREATE TABLE turnstile_summary
+>WITH (
+>    KAFKA_TOPIC='turnstile.summary',
+>    VALUE_FORMAT='JSON'
+>) AS
+>    select station_id, count(*) as count from TURNSTILE group by station_id;
+
+ Message
+---------------------------
+ Table created and running
+---------------------------
+
+ksql> SHOW TABLES;
+
+ Table Name        | Kafka Topic       | Format | Windowed
+-----------------------------------------------------------
+ TURNSTILE         | turnstile         | AVRO   | false
+ TURNSTILE_SUMMARY | turnstile.summary | JSON   | false
+-----------------------------------------------------------
+
+ksql> select * from TURNSTILE limit 5;
+1606000478149 | 枴ѽ] | 40220 | Western/Forest Pk Branch | blue
+1606000477803 | �ѽ] | 40230 | Cumberland | blue
+1606000477803 | ֙�ѽ] | 40230 | Cumberland | blue
+1606000477830 | ڙ�ѽ] | 40750 | Harlem | blue
+1606000478189 | ܟ�ѽ] | 40970 | Cicero | blue
+Limit Reached
+Query terminated
+
+ksql> select * from TURNSTILE_SUMMARY limit 5;
+1606000477878 | 41330 | 41330 | 2
+1606000478210 | 40180 | 40180 | 1
+1606000478149 | 40220 | 40220 | 1
+1606000478189 | 40970 | 40970 | 1
+1606000477803 | 40230 | 40230 | 2
+Limit Reached
+Query terminated
+
+ksql> SHOW TOPICS;
+
+ Kafka Topic                          | Registered | Partitions | Partition Replicas | Consumers | ConsumerGroups
+------------------------------------------------------------------------------------------------------------------
+ _schemas                             | false      | 1          | 1                  | 0         | 0
+ addison.arrival                      | false      | 1          | 1                  | 0         | 0
+ austin.arrival                       | false      | 1          | 1                  | 0         | 0
+ ...
+ turnstile                            | true       | 1          | 1                  | 1         | 1
+ turnstile.summary                    | true       | 4          | 1                  | 0         | 0
+ uic_halsted.arrival                  | false      | 1          | 1                  | 0         | 0
+ washington.arrival                   | false      | 1          | 1                  | 0         | 0
+ western_and_forest_pk_branch.arrival | false      | 1          | 1                  | 0         | 0
+ western_and_ohare_branch.arrival     | false      | 1          | 1                  | 0         | 0
+------------------------------------------------------------------------------------------------------------------
+
+ksql> describe turnstile_summary;
+
+Name                 : TURNSTILE_SUMMARY
+ Field      | Type
+----------------------------------------
+ ROWTIME    | BIGINT           (system)
+ ROWKEY     | VARCHAR(STRING)  (system)
+ STATION_ID | INTEGER
+ COUNT      | BIGINT
+----------------------------------------
+For runtime statistics and query details run: DESCRIBE EXTENDED <Stream,Table>;
+
+ksql> SHOW QUERIES;
+
+ Query ID                 | Kafka Topic       | Query String
+-----------------------------------------------------------------------------------------------------------------------------
+ CTAS_TURNSTILE_SUMMARY_0 | TURNSTILE_SUMMARY | CREATE TABLE turnstile_summary
+WITH (
+    KAFKA_TOPIC='turnstile.summary',
+    VALUE_FORMAT='JSON'
+) AS
+    select station_id, count(*) as count from TURNSTILE group by station_id;
+-----------------------------------------------------------------------------------------------------------------------------
+For detailed information on a Query run: EXPLAIN <Query ID>;
+ksql> terminate CTAS_TURNSTILE_SUMMARY_0;
+
+ Message
+-------------------
+ Query terminated.
+-------------------
+ksql> drop table TURNSTILE_SUMMARY;
+
+ Message
+----------------------------------------
+ Source TURNSTILE_SUMMARY was dropped.
+----------------------------------------
+ksql> drop table TURNSTILE;
+
+ Message
+--------------------------------
+ Source TURNSTILE was dropped.
+--------------------------------
+ksql>
+
+```
