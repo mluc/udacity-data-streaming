@@ -41,7 +41,7 @@ class Producer:
         #
         #
         self.broker_properties = {
-            "SCHEMA_REGISTRY_URL": "http://localhost:8081",
+            "SCHEMA_REGISTRY_URL": SCHEMA_REGISTRY_URL,
             "BROKER_URL": "PLAINTEXT://localhost:9092"
         }
 
