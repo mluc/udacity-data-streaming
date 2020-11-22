@@ -34,12 +34,7 @@ class Producer:
         self.num_partitions = num_partitions
         self.num_replicas = num_replicas
 
-        #
-        #
-        # TODO: Configure the broker properties below. Make sure to reference the project README
-        # and use the Host URL for Kafka and Schema Registry!
-        #
-        #
+        # use the Host URL for Kafka and Schema Registry!
         self.broker_properties = {
             "SCHEMA_REGISTRY_URL": SCHEMA_REGISTRY_URL,
             "BROKER_URL": "PLAINTEXT://localhost:9092"
@@ -50,18 +45,13 @@ class Producer:
             self.create_topic()
             Producer.existing_topics.add(self.topic_name)
 
-        # TODO: Configure the AvroProducer
         self.producer = AvroProducer({"bootstrap.servers": BROKER_URL, "schema.registry.url": SCHEMA_REGISTRY_URL},
                                      default_key_schema=self.key_schema, default_value_schema=self.value_schema)
 
     def create_topic(self):
         """Creates the producer topic if it does not already exist"""
-        #
-        #
-        # TODO: Write code that creates the topic for this producer if it does not already exist on
-        # the Kafka Broker.
-        #
-        #
+        logger.info("topic creation kafka integration")
+
         client = AdminClient({"bootstrap.servers": BROKER_URL})
         futures = client.create_topics(
             [
@@ -86,17 +76,10 @@ class Producer:
             except Exception as e:
                 logger.info(f"failed to create topic {self.topic_name}: {e}")
 
-        logger.info("topic creation kafka integration incomplete - skipping")
-
     def close(self):
         """Prepares the producer for exit by cleaning up the producer"""
-        #
-        #
-        # TODO: Write cleanup code for the Producer here
-        #
-        #
         self.producer.close()
-        logger.info("producer close incomplete - skipping")
+        logger.info("producer close")
 
     def time_millis(self):
         """Use this function to get the key for Kafka Events"""

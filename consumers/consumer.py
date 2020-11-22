@@ -33,17 +33,11 @@ class KafkaConsumer:
         self.consume_timeout = consume_timeout
         self.offset_earliest = offset_earliest
 
-        #
-        #
-        # TODO: Configure the broker properties below. Make sure to reference the project README
-        # and use the Host URL for Kafka and Schema Registry!
-        #
-        #
         self.broker_properties = {
             "SCHEMA_REGISTRY_URL": SCHEMA_REGISTRY_URL,
             "BROKER_URL": "PLAINTEXT://localhost:9092"
         }
-        # TODO: Create the Consumer, using the appropriate type.
+
         if is_avro is True:
             schema_registry = CachedSchemaRegistryClient({"url": SCHEMA_REGISTRY_URL})
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
@@ -60,19 +54,11 @@ class KafkaConsumer:
                 }
             )
 
-        #
-        #
-        # TODO: Configure the AvroConsumer and subscribe to the topics. Make sure to think about
-        # how the `on_assign` callback should be invoked.
-        #
-        #
         self.consumer.subscribe([self.topic_name_pattern], on_assign=self.on_assign)
 
     def on_assign(self, consumer, partitions):
         """Callback for when topic assignment takes place"""
-        # TODO: If the topic is configured to use `offset_earliest` set the partition offset to
-        # the beginning or earliest
-        logger.info("on_assign is incomplete - skipping")
+        logger.info("consumer on_assign")
         if self.offset_earliest:
             for partition in partitions:
                 partition.offset = OFFSET_BEGINNING
@@ -104,12 +90,6 @@ class KafkaConsumer:
                 print(f"Failed to unpack message {e}")
                 raise
 
-
     def close(self):
         """Cleans up any open kafka consumers"""
-        #
-        #
-        # TODO: Cleanup the kafka consumer
-        #
-        #
         self.consumer.close()
