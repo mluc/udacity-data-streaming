@@ -40,4 +40,6 @@ class Station:
 
     def process_message(self, json_data):
         """Handles arrival and turnstile messages"""
+        logger.info("consumer station process_message")
+        print("consumer station process_message")
         self.num_turnstile_entries = json_data["COUNT"]

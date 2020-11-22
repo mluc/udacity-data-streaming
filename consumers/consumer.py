@@ -90,14 +90,7 @@ class KafkaConsumer:
 
     def _consume(self):
         """Polls for a message. Returns 1 if a message was received, 0 otherwise"""
-        #
-        #
-        # TODO: Poll Kafka for messages. Make sure to handle any errors or exceptions.
-        # Additionally, make sure you return 1 when a message is processed, and 0 when no message
-        # is retrieved.
-        #
-        #
-        message = self.consumer.poll(1.0)
+        message = self.consumer.poll(self.consume_timeout)
         if message is None:
             return 0
         elif message.error() is not None:
@@ -105,7 +98,7 @@ class KafkaConsumer:
             raise
         else:
             try:
-                print(message.value())
+                self.message_handler(message)
                 return 1
             except KeyError as e:
                 print(f"Failed to unpack message {e}")
