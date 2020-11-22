@@ -48,7 +48,7 @@ class KafkaConsumer:
             schema_registry = CachedSchemaRegistryClient({"url": SCHEMA_REGISTRY_URL})
             self.broker_properties["schema.registry.url"] = "http://localhost:8081"
             self.consumer = AvroConsumer(
-                {"bootstrap.servers": BROKER_URL, "group.id": "0"},
+                {"bootstrap.servers": BROKER_URL, "group.id": "0", "auto.offset.reset": "earliest"},
                 schema_registry=schema_registry,
             )
         else:
@@ -73,8 +73,9 @@ class KafkaConsumer:
         # TODO: If the topic is configured to use `offset_earliest` set the partition offset to
         # the beginning or earliest
         logger.info("on_assign is incomplete - skipping")
-        for partition in partitions:
-            partition.offset = OFFSET_BEGINNING
+        if self.offset_earliest:
+            for partition in partitions:
+                partition.offset = OFFSET_BEGINNING
 
         logger.info("partitions assigned for %s", self.topic_name_pattern)
         consumer.assign(partitions)
