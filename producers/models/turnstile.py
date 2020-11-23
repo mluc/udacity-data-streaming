@@ -1,5 +1,6 @@
 """Creates a turnstile data producer"""
 import logging
+import constants
 from pathlib import Path
 
 from confluent_kafka import avro
@@ -28,7 +29,7 @@ class Turnstile(Producer):
         )
 
         super().__init__(
-            "turnstile",
+            constants.TURNSTILE_TOPIC,
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema,
             num_partitions=1,

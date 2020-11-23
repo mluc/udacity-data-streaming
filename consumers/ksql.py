@@ -1,7 +1,7 @@
 """Configures KSQL to combine station and turnstile data"""
 import json
 import logging
-
+import constants
 import requests
 
 import topic_check
@@ -19,29 +19,28 @@ KSQL_URL = "http://localhost:8088"
 #       Make sure to cast the COUNT of station id to `count`
 #       Make sure to set the value format to JSON
 
-KSQL_STATEMENT = """
+KSQL_STATEMENT = f"""
 CREATE TABLE turnstile (
     station_id INTEGER,
     station_name VARCHAR,
     line VARCHAR 
 ) WITH (
-    KAFKA_TOPIC='turnstile',
+    KAFKA_TOPIC='{constants.TURNSTILE_TOPIC}',
     VALUE_FORMAT='AVRO',
     KEY='station_id'
 );
 
 CREATE TABLE turnstile_summary
 WITH (
-    KAFKA_TOPIC='TURNSTILE_SUMMARY',
+    KAFKA_TOPIC='{constants.TURNSTILE_SUMMARY_TOPIC}',
     VALUE_FORMAT='JSON'
 ) AS
     select station_id, count(*) as COUNT from TURNSTILE group by station_id;
 """
 
-
 def execute_statement():
     """Executes the KSQL statement against the KSQL API"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is True:
+    if topic_check.topic_exists(constants.TURNSTILE_SUMMARY_TOPIC) is True:
         return
 
     logging.debug("executing ksql statement...")

@@ -1,5 +1,6 @@
 """Methods pertaining to loading and configuring CTA "L" station data."""
 import logging
+import constants
 from pathlib import Path
 
 from confluent_kafka import avro
@@ -26,7 +27,7 @@ class Station(Producer):
             .replace("-", "_")
             .replace("'", "")
         )
-        topic_name = f"org.chicago.cta.station.arrivals.{station_name}"
+        topic_name = f"{constants.STATION_TOPIC_PREFIX}.{station_name}"
         super().__init__(
             topic_name,
             key_schema=Station.key_schema,

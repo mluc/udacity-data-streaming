@@ -2,7 +2,7 @@
 import logging
 
 import faust
-
+import constants
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ app = faust.App("stations-stream", broker="kafka://localhost:9092", store="memor
 # Define the input Kafka Topic. Hint: What topic did Kafka Connect output to?
 topic = app.topic("my-topic-stations", value_type=Station)
 # Define the output Kafka Topic
-out_topic = app.topic("org.chicago.cta.stations.table.v1", partitions=1)
+out_topic = app.topic(constants.STATION_FAUST_TABLE_TOPIC, partitions=1)
 # Define a Faust Table
 table = app.Table(
    "my-topic-stations-table",

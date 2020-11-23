@@ -9,10 +9,10 @@ import urllib.parse
 
 import requests
 
+import constants
 from models.producer import Producer
 
 logger = logging.getLogger(__name__)
-TOPIC_NAME = 'org.chicago.cta.weather.v1'
 
 
 class Weather(Producer):
@@ -32,7 +32,7 @@ class Weather(Producer):
 
     def __init__(self, month):
         super().__init__(
-            TOPIC_NAME,
+            constants.WEATHER_TOPIC,
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
         )
@@ -68,7 +68,7 @@ class Weather(Producer):
         # specify the Avro schemas and verify that you are using the correct Content-Type header.
         logger.info("weather kafka proxy integration")
         resp = requests.post(
-            f"{Weather.rest_proxy_url}/topics/{TOPIC_NAME}",
+            f"{Weather.rest_proxy_url}/topics/{constants.WEATHER_TOPIC}",
             headers={"Content-Type": "application/vnd.kafka.json.v2+json"},
             data=json.dumps(
                 {

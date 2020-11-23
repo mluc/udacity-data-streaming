@@ -1,6 +1,7 @@
 """Defines a Tornado Server that consumes Kafka Event data for display"""
 import logging
 import logging.config
+import constants
 from pathlib import Path
 
 import tornado.ioloop
@@ -41,12 +42,12 @@ class MainHandler(tornado.web.RequestHandler):
 
 def run_server():
     """Runs the Tornado Server and begins Kafka consumption"""
-    if topic_check.topic_exists("TURNSTILE_SUMMARY") is False:
+    if topic_check.topic_exists(constants.TURNSTILE_SUMMARY_TOPIC) is False:
         logger.fatal(
             "Ensure that the KSQL Command has run successfully before running the web server!"
         )
         exit(1)
-    if topic_check.topic_exists("org.chicago.cta.stations.table.v1") is False:
+    if topic_check.topic_exists(constants.STATION_FAUST_TABLE_TOPIC) is False:
         logger.fatal(
             "Ensure that Faust Streaming is running successfully before running the web server!"
         )
@@ -63,23 +64,23 @@ def run_server():
     # Build kafka consumers
     consumers = [
         KafkaConsumer(
-            "org.chicago.cta.weather.v1",
+            constants.WEATHER_TOPIC,
             weather_model.process_message,
             offset_earliest=True,
         ),
         KafkaConsumer(
-            "org.chicago.cta.stations.table.v1",
+            constants.STATION_FAUST_TABLE_TOPIC,
             lines.process_message,
             offset_earliest=True,
             is_avro=False,
         ),
         KafkaConsumer(
-            "^org.chicago.cta.station.arrivals.",
+            f"^{constants.STATION_TOPIC_PREFIX}.",
             lines.process_message,
             offset_earliest=True,
         ),
         KafkaConsumer(
-            "TURNSTILE_SUMMARY",
+            constants.TURNSTILE_SUMMARY_TOPIC,
             lines.process_message,
             offset_earliest=True,
             is_avro=False,

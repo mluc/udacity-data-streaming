@@ -1,7 +1,7 @@
 """Contains functionality related to Lines"""
 import json
 import logging
-
+import constants
 from models import Station
 
 
@@ -58,15 +58,15 @@ class Line:
         """Given a kafka message, extract data"""
         logger.info("consumer line process_message")
         print("consumer line process_message")
-        if "org.chicago.cta.stations.table.v1" == message.topic(): # Set the conditional correctly to the stations Faust Table
+        if constants.STATION_FAUST_TABLE_TOPIC == message.topic(): # Set the conditional correctly to the stations Faust Table
             try:
                 value = json.loads(message.value())
                 self._handle_station(value)
             except Exception as e:
                 logger.fatal("bad station? %s, %s", value, e)
-        elif "org.chicago.cta.station.arrivals" in message.topic(): # Set the conditional to the arrival topic
+        elif constants.STATION_TOPIC_PREFIX in message.topic(): # Set the conditional to the arrival topic
             self._handle_arrival(message)
-        elif "TURNSTILE_SUMMARY" == message.topic(): # Set the conditional to the KSQL Turnstile Summary Topic
+        elif constants.TURNSTILE_SUMMARY_TOPIC == message.topic(): # Set the conditional to the KSQL Turnstile Summary Topic
             json_data = json.loads(message.value())
             station_id = json_data.get("STATION_ID")
             station = self.stations.get(station_id)
