@@ -1,5 +1,15 @@
 # Public Transit Status with Apache Kafka
-## Testing:
+## Github link:
+- https://github.com/mluc/udacity-data-streaming
+## How to run:
+- `docker-compose up`
+- `python producers/simulation.py`
+- `faust -A faust_stream worker -l info`
+- `python consumers/python ksql.py`
+- `python consumers/python server.py`
+## Screenshots:
+- `screenshot.png`
+## Testing during development:
 ### Test Kafka Producers:
 - `python producer_test.py`
 ```
