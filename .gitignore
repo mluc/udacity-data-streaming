@@ -1,0 +1,4 @@
+.idea/*
+__pycache__
+venv
+police-department-calls-for-service-full.json
