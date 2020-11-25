@@ -22,7 +22,7 @@ sf.crime.topic
 ## Step 3:
 - How did changing values on the SparkSession property parameters affect the throughput and latency of the data?
     - The larger `maxOffsetsPerTrigger` value, the more data needs to be shuffled (shuffle read/write is higher). Larger `maxOffsetsPerTrigger` value will take longer to finish the batch.
-    - `processingTime`: The trigger interval is too small, batches fall behind since needs more time to process. If it is too big, the next batch needs to wait.
+    - `processingTime`: The trigger interval is too small, batches fall behind since time to process is larger trigger interval. If it is too big, the next batch needs to wait.
 
 - What were the 2-3 most efficient SparkSession property key/value pairs? Through testing multiple variations on values, how can you tell these were the most optimal?
     - `maxOffsetsPerTrigger` = 200 and `processingTime` = 5 seconds are good for this dataset. Average duration is 5 s and shuffle read/write is minimal.
