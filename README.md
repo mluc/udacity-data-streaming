@@ -1,4 +1,6 @@
 # udacity-data-streaming
+## Github link:
+- https://github.com/mluc/udacity-data-streaming
 ## Step 1:
 - Terminal 1: `/usr/bin/zookeeper-server-start config/zookeeper.properties`
 - Terminal 2: `/usr/bin/kafka-server-start config/server.properties`
